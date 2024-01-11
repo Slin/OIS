@@ -147,31 +147,44 @@ if (WIN32)
     )
 endif()
 
-if (APPLE)
-    set(CMAKE_MACOSX_RPATH 1)
-    find_library(COCOA_LIBRARY Cocoa)
-    find_library(FOUNDATION_LIBRARY Foundation)
-    find_library(IOKIT_LIBRARY IOKit)
-    find_path(COCOA_INCLUDE_DIR Cocoa/Cocoa.h)
-    find_library(CARBON_LIBRARY Carbon)
+if(APPLE)
+    if((CMAKE_SYSTEM_NAME STREQUAL "visionOS"))
+        set(VISIONOS 1)
+    endif()
 
     add_definitions(-x objective-c++)
 
-    include_directories(SYSTEM ${COCOA_INCLUDE_DIR})
-    set(ois_source
-        ${ois_source}
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/mac/MacHelpers.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/mac/MacHIDManager.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/mac/MacInputManager.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/mac/MacJoyStick.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/mac/MacKeyboard.cpp"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/mac/MacMouse.cpp"
+    if(IOS OR VISIONOS)
+        set(ois_source
+            ${ois_source}
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/iphone/iPhoneInputManager.mm"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/iphone/iPhoneAccelerometer.mm"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/iphone/iPhoneMultiTouch.mm"
+        )
+    else()
+        set(CMAKE_MACOSX_RPATH 1)
+        find_library(COCOA_LIBRARY Cocoa)
+        find_library(FOUNDATION_LIBRARY Foundation)
+        find_library(IOKIT_LIBRARY IOKit)
+        find_path(COCOA_INCLUDE_DIR Cocoa/Cocoa.h)
+        find_library(CARBON_LIBRARY Carbon)
 
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/mac/CocoaInputManager.mm"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/mac/CocoaJoyStick.mm"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/mac/CocoaKeyboard.mm"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/mac/CocoaMouse.mm"
-    )
+        include_directories(SYSTEM ${COCOA_INCLUDE_DIR})
+        set(ois_source
+            ${ois_source}
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/mac/MacHelpers.cpp"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/mac/MacHIDManager.cpp"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/mac/MacInputManager.cpp"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/mac/MacJoyStick.cpp"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/mac/MacKeyboard.cpp"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/mac/MacMouse.cpp"
+
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/mac/CocoaInputManager.mm"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/mac/CocoaJoyStick.mm"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/mac/CocoaKeyboard.mm"
+            "${CMAKE_CURRENT_SOURCE_DIR}/src/mac/CocoaMouse.mm"
+        )
+    endif()
 endif()
 
 source_group("OIS" FILES ${ois_source})
@@ -187,9 +200,14 @@ endif()
 set_target_properties(OIS PROPERTIES SOLUTION_FOLDER "libOIS")
 
 if (APPLE)
-    target_link_libraries(OIS ${COCOA_LIBRARY})
-    target_link_libraries(OIS ${IOKIT_LIBRARY})
-    target_link_libraries(OIS ${FOUNDATION_LIBRARY})
+    if(IOS OR VISIONOS)
+        find_library(UIKIT_LIBRARY UIKit)
+        target_link_libraries(OIS ${UIKIT_LIBRARY})
+    else()
+        target_link_libraries(OIS ${COCOA_LIBRARY})
+        target_link_libraries(OIS ${IOKIT_LIBRARY})
+        target_link_libraries(OIS ${FOUNDATION_LIBRARY})
+    endif()
 endif()
 
 if (WIN32)
