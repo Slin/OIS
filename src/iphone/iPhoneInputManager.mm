@@ -122,16 +122,18 @@ iPhoneInputManager::~iPhoneInputManager()
 //--------------------------------------------------------------------------------//
 void iPhoneInputManager::_initialize(ParamList& paramList)
 {
-	_parseConfigSettings(paramList);
+	dispatch_sync(dispatch_get_main_queue(), ^{
+		_parseConfigSettings(paramList);
 
-	mDelegate = [[InputDelegate alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+		mDelegate = [[InputDelegate alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 
-	// Set flags that we want to accept multiple finger touches and be the only one to receive touch events
-	[mDelegate setMultipleTouchEnabled:YES];
-	[mDelegate setExclusiveTouch:YES];
-	[mDelegate becomeFirstResponder];
+		// Set flags that we want to accept multiple finger touches and be the only one to receive touch events
+		[mDelegate setMultipleTouchEnabled:YES];
+		[mDelegate setExclusiveTouch:YES];
+		[mDelegate becomeFirstResponder];
 
-	[mWindow addSubview:mDelegate];
+		[mWindow addSubview:mDelegate];
+	});
 }
 
 //--------------------------------------------------------------------------------//
