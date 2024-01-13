@@ -154,13 +154,14 @@ if(APPLE)
 
     add_definitions(-x objective-c++)
 
-    if(IOS OR VISIONOS)
+    if(IOS)
         set(ois_source
             ${ois_source}
             "${CMAKE_CURRENT_SOURCE_DIR}/src/iphone/iPhoneInputManager.mm"
             "${CMAKE_CURRENT_SOURCE_DIR}/src/iphone/iPhoneAccelerometer.mm"
             "${CMAKE_CURRENT_SOURCE_DIR}/src/iphone/iPhoneMultiTouch.mm"
         )
+    elseif(VISIONOS)
     else()
         set(CMAKE_MACOSX_RPATH 1)
         find_library(COCOA_LIBRARY Cocoa)

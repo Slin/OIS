@@ -81,8 +81,10 @@ following restrictions:
 #		endif
 #	endif
 #elif defined( __APPLE_CC__ ) // Apple OS X
+#	if __VISION_OS_VERSION_MIN_REQUIRED
+#		define OIS_VISIONOS_PLATFORM
     // Device                                       Simulator
-#   if __IPHONE_OS_VERSION_MIN_REQUIRED >= 20201 || __IPHONE_OS_VERSION_MIN_REQUIRED >= 20000
+#   elif __IPHONE_OS_VERSION_MIN_REQUIRED >= 20201 || __IPHONE_OS_VERSION_MIN_REQUIRED >= 20000
 //#   if __IPHONE_OS_VERSION_MIN_REQUIRED >= 30000 || __IPHONE_OS_VERSION_MIN_REQUIRED >= 30000
 #       define OIS_IPHONE_PLATFORM
 #   else
